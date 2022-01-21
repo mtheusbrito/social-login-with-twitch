@@ -50,10 +50,16 @@ export function Home() {
   const theme = useTheme();
   const { signOut, user, isLoggingOut } = useAuth();
 
-  // creates a function to handle sign out
-    // try to call and wait signOut
-    // if fails, display an Alert with the title "Erro SignOut" and message "Ocorreu um erro ao tentar se deslogar do app"
 
+  async function handleSignOut(){
+   try{
+      await signOut(); 
+   }catch(error){
+     Alert.alert('Error SignOut', "Ocorreu um erro ao deslogar do app")
+   }
+
+  }
+  
   async function getTopGames() {
     try {
       const response = await api.get('/games/top');
@@ -118,35 +124,54 @@ export function Home() {
           <Avatar source={{ uri: user.profile_image_url }} />
 
           <UserInfoText>Olá, </UserInfoText>
-          <UserInfoText style={{ fontFamily: theme.fonts.bold }}>{user.display_name}</UserInfoText>
+          <UserInfoText style={{ fontFamily: theme.fonts.bold }}>
+            {user.display_name}
+          </UserInfoText>
         </UserInfo>
 
-        {/* <SignOutButton onPress={}>
-          Verify if isLoggingOut is true
-          If it is, show an ActivityIndicator
-          Otherwise, show Feather's power icon
-        </SignOutButton> */}
+        <SignOutButton onPress={handleSignOut}>
+          {isLoggingOut ? (<ActivityIndicator 
+          size={25} 
+          color={theme.colors.white}
+          />): (
+          <Feather 
+          name='power' 
+          size={24} 
+          color={theme.colors.white}/>
+          )}
+        </SignOutButton>
       </Header>
 
       <UserFollowedStreams>
-        <UserFollowedStreamsTitle>Canais que você segue</UserFollowedStreamsTitle>
+        <UserFollowedStreamsTitle>
+          Canais que você segue
+        </UserFollowedStreamsTitle>
 
-        <FlatList 
-          data={!isLoadingUserFollowedStreams ? userFollowedStreams : [{ id: '1' } as UserFollowedStreamsFormatted, { id: '2' } as UserFollowedStreamsFormatted]}
-          keyExtractor={item => item.id}
+        <FlatList
+          data={
+            !isLoadingUserFollowedStreams
+              ? userFollowedStreams
+              : [
+                  { id: '1' } as UserFollowedStreamsFormatted,
+                  { id: '2' } as UserFollowedStreamsFormatted,
+                ]
+          }
+          keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           maxToRenderPerBatch={4}
           initialNumToRender={4}
-          getItemLayout={(_, index) => (
-            { length: 276, offset: 276 * index, index }
-          )}
+          getItemLayout={(_, index) => ({
+            length: 276,
+            offset: 276 * index,
+            index,
+          })}
           contentContainerStyle={{
             paddingLeft: 24,
-            paddingRight: 12
+            paddingRight: 12,
           }}
           renderItem={({ item }) => (
-            <UserFollowedStreamCard 
+            <UserFollowedStreamCard
               avatarUrl={item.user_avatar_url}
               streamer_login={item.user_login}
               streamer_name={item.user_name}
@@ -162,19 +187,29 @@ export function Home() {
       <TopGames>
         <TopGamesTitle>Mais assistidos do momento</TopGamesTitle>
 
-        <FlatList 
-          data={!isLoadingTopGames ? topGames : [{ id: '1' } as TopGames, { id: '2' } as TopGames, { id: '3' } as TopGames]}
-          keyExtractor={item => item.id}
+        <FlatList
+          data={
+            !isLoadingTopGames
+              ? topGames
+              : [
+                  { id: '1' } as TopGames,
+                  { id: '2' } as TopGames,
+                  { id: '3' } as TopGames,
+                ]
+          }
+          keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           maxToRenderPerBatch={5}
           initialNumToRender={5}
-          getItemLayout={(_, index) => (
-            { length: 166, offset: 166 * index, index }
-          )}
+          getItemLayout={(_, index) => ({
+            length: 166,
+            offset: 166 * index,
+            index,
+          })}
           contentContainerStyle={{
             paddingLeft: 24,
-            paddingRight: 8
+            paddingRight: 8,
           }}
           renderItem={({ item }) => (
             <TopGamesCard
@@ -187,15 +222,13 @@ export function Home() {
         />
       </TopGames>
 
-      <Modal 
+      <Modal
         animationType="fade"
         visible={isLoggingOut}
         statusBarTranslucent
         transparent
       >
-        <View
-          style={{ flex: 1, backgroundColor: 'rgba(14, 14, 16, 0.5)' }}
-        />
+        <View style={{ flex: 1, backgroundColor: 'rgba(14, 14, 16, 0.5)' }} />
       </Modal>
     </Container>
   );
